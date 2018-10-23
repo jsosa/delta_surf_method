@@ -4,12 +4,14 @@
 # auth: jeison sosa
 # mail: j.sosa@bristol.ac.uk / sosa.jeison@gmail.com
 
+from sys import exit
 import subprocess
 import numpy as np
 import gdalutils as gu
 
-void_demf = 'lidar_clip.tif'
-fill_demf = 'OS_terrain_50_clip.tif'
+os        = 'osx'
+void_demf = 'lidar_england_50m.tif'
+fill_demf = 'OS_terrain_50.tif'
 nodata    = -9999 # non data value in both datasets
 
 # Calculate delta surface with voids
@@ -30,7 +32,13 @@ def step_02():
 
     subprocess.call(['gdal_translate','-of','XYZ','delta_surf_wt_voids.tif','delta_surf_wt_voids.xyz'])
     subprocess.call(['sed','s/ /,/g','delta_surf_wt_voids.xyz'],stdout=open('delta_surf_wt_voids.csv','w'))
-    subprocess.call(['sed','-i','','/-9999/d','delta_surf_wt_voids.csv'])
+    if os == 'osx':
+        subprocess.call(['sed','-i','','/-9999/d','delta_surf_wt_voids.csv'])
+    elif os == 'linux':
+        subprocess.call(['sed','-i','/-9999/d','delta_surf_wt_voids.csv'])
+    else:
+        print('OS not identified')
+        exit(0)
 
     f = open('delta_surf_wt_voids.vrt','w')
     f.write('<OGRVRTDataSource>'+'\n')
